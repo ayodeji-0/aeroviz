@@ -32,6 +32,7 @@ from styles.stylesheet import *
 # Page Config
 #st.set_page_config(layout="wide", page_icon="./icons/icon.ico"
 st.set_page_config(page_title='AeroViz', layout = 'wide', page_icon = "./icons/icon.ico", initial_sidebar_state = 'auto')
+
 # Apply styling
 apply_all_styles()
 
