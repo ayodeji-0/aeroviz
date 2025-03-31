@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from numpy.typing import NDArray
 
-from modules.cbt.analysis import FlutterAnalysis
+from .analysis import FlutterAnalysis
 from utils.cbt.constants import ps_indep_dict, ps_dep_dict
 
 class ParametricStudy:

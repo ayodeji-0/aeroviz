@@ -13,8 +13,6 @@ from .cbt import (
     find_closest_points
 )
 
-from .cbt.constants import ps_indep_dict, ps_dep_dict
-
 __all__ = [
     'ps_indep_dict',
     'ps_dep_dict',
