@@ -1,11 +1,15 @@
 import streamlit as st
+import sys, os
+sys.path.append(os.path.abspath('.'))  # Ensures root is in sys.path
 
-# Import modules
+# Apply styles
+from styles.stylesheet import *
+
+# Import your modules
 from modules.cbt.airfoil import Airfoil
 from modules.cbt.analysis import FlutterAnalysis
 from modules.cbt.parametric import ParametricStudy
 from utils.cbt.constants import ps_indep_dict, ps_dep_dict
-from styles.stylesheet import apply_all_styles
 
 # Page Config
 st.set_page_config(page_title='AeroViz', layout = 'wide', page_icon = "./icons/icon.ico", initial_sidebar_state = 'collapsed')
