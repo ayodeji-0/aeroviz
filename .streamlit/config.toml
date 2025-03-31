@@ -1,0 +1,15 @@
+[theme]
+base="dark"
+primaryColor="#339999"
+
+secondaryBackgroundColor="#403E43"
+
+#client.showErrorDetails = false # TODO: change to true on deployment
+
+#client.showErrorOnDeployedApp = false
+
+# for clean rendering
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = false
