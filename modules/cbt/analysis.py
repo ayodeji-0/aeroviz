@@ -63,8 +63,11 @@ class FlutterAnalysis:
             self.omega = np.abs(self.vals.imag)  # Frequency component
             self.zeta = -self.vals.real / np.abs(self.vals.imag)  # Damping ratio
 
+        elif self.mode == 'Quasi Steady - State Space':
+            raise NotImplementedError("Quasi Steady mode is not implemented yet, use Steady for now.")
+
         else:
-            raise ValueError("Only 'Steady - State Space' mode is currently implemented")
+            raise ValueError("Only Steady and Quasi Steady modes are currently implemented, with state space representation.")
 
     def plot_displacements(self, duration=10, width=600, height=600):
         """

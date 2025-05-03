@@ -116,7 +116,7 @@ with col1:
                 e = st.slider('Eccentricity · $e$', 0.0, 1.0, 0.5, 0.01)
                 r = st.slider('Radius of Gyration · $r$', 0.0, 1.0, 0.5, 0.01)
                 w_theta = st.slider('Torsional Vibration Frequency · $w_{\\theta}$', 0.0, 1000.0, 100.0, 0.1)
-                mode = st.selectbox('Aerodynamic Influence', ['Steady-State Space', 'Quasi-Steady State Space'])
+                mode = st.selectbox('Aerodynamic Influence', [f'Steady - State Space', f'Quasi Steady - State Space'])
 
                 
                 # Store system parameters as a tuple
