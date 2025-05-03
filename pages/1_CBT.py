@@ -3,6 +3,7 @@ import streamlit as st
 # Import modules
 from modules.cbt.airfoil import Airfoil
 from modules.cbt.analysis import FlutterAnalysis
+from modules.cbt.analysis import mode_options
 from modules.cbt.parametric import ParametricStudy
 from utils.cbt.constants import ps_indep_dict, ps_dep_dict
 from styles.stylesheet import apply_all_styles
@@ -116,8 +117,10 @@ with col1:
                 e = st.slider('Eccentricity · $e$', 0.0, 1.0, 0.5, 0.01)
                 r = st.slider('Radius of Gyration · $r$', 0.0, 1.0, 0.5, 0.01)
                 w_theta = st.slider('Torsional Vibration Frequency · $w_{\\theta}$', 0.0, 1000.0, 100.0, 0.1)
-                mode = st.selectbox('Aerodynamic Influence', [f'Steady - State Space', f'Quasi Steady - State Space'])
-
+                #mode = st.selectbox('Aerodynamic Influence', [f'Steady - State Space', f'Quasi Steady - State Space'])
+                #mode = st.selectbox('Aerodynamic', ['Steady', 'Quasi Steady'])
+                mode_display = st.selectbox('Aerodynamic', list(mode_options.keys()))
+                mode = mode_options[mode_display]  # This will be the exact string you need
                 
                 # Store system parameters as a tuple
                 sys_params = (mu, sigma, V, a, b, e, r, mode, w_theta)

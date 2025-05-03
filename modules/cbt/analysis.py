@@ -7,6 +7,13 @@ import scipy.linalg as la
 import streamlit as st
 from IPython.display import HTML
 
+# Global Variables
+mode_options = {
+    'Steady - State Space': 'Steady - State Space',
+    'Quasi Steady - State Space': 'Quasi Steady - State Space',
+}
+
+
 class FlutterAnalysis:
     """
     Class to represent flutter analysis for a coupled system.
@@ -63,6 +70,7 @@ class FlutterAnalysis:
             self.omega = np.abs(self.vals.imag)  # Frequency component
             self.zeta = -self.vals.real / np.abs(self.vals.imag)  # Damping ratio
 
+        #elif self.mode == 'Quasi Steady - State Space':
         elif self.mode == 'Quasi Steady - State Space':
             raise NotImplementedError("Quasi Steady mode is not implemented yet, use Steady for now.")
 
