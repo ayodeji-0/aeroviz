@@ -1,2 +1,39 @@
 __pycache__/
 *.pyc
+google_credentials.json
+venv/
+
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Environment and dependencies
+venv/
+.env
+.venv
+env/
+ENV/
+google_credentials.json
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Streamlit specific
+.streamlit/secrets.toml
+
+# Jupyter Notebooks
+.ipynb_checkpoints

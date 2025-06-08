@@ -33,7 +33,7 @@ from styles.stylesheet import *
 #st.set_page_config(layout="wide", page_icon="./icons/icon.ico"
 st.set_page_config(page_title='AeroViz', layout = 'wide', page_icon = "./icons/icon.ico", initial_sidebar_state = 'auto')
 
-# Apply styling
+# Apply page styling
 apply_all_styles()
 
 ## Page Setup
@@ -41,7 +41,7 @@ cont_height = 150
 col1, col2, col3 = st.columns([0.1, 3, 0.1]) # using columns to center the header text and image
 
 with col2:
-      # Header Text
+    # Header Text
     st.title("AeroViz")
     # Header Image
     st.image("./images/header_image.png", use_container_width = True)

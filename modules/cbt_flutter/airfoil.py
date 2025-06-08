@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 from matplotlib.figure import Figure
 from numpy.typing import NDArray
+import streamlit as st
 
 class Airfoil:
     """
@@ -174,3 +175,5 @@ class Airfoil:
         ax.axis('off')
 
         return fig
+    
+    # No plotly version, matplotlib is sufficient, and better for airfoil plotting

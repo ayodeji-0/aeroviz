@@ -1,6 +1,7 @@
 """Stylesheet for AeroViz application."""
 
 import streamlit as st
+import streamlit.components.v1 as components
 from typing import Optional
 import matplotlib.pyplot as plt
 def set_page_style() -> None:
@@ -192,6 +193,27 @@ def remove_decoration() -> None:
         </style>
     """, unsafe_allow_html=True)
 
+def remove_top_padding() -> None:
+    # # App Header Styling - page label vertical translation and background color
+    st.markdown(
+        """
+            <style>
+                    .stAppHeader {
+                        background-color: rgba(255, 255, 255, 0.0);  /* Transparent background */
+                        visibility: visible;  /* Ensure the header is visible */
+                    }
+
+                .block-container {
+                        padding-top: 0rem;
+                        padding-bottom: 0rem;
+                        padding-left: 1.5rem;
+                        padding-right: 1.5rem;
+                        margin-top: -4.5rem !important; /* Additional negative margin to move up further */
+                    }
+            </style>
+            """,
+        unsafe_allow_html=True)
+
 def global_plt_style() -> None:
         # Global Plot Styling
     plt.rcParams["text.color"] = "white"
@@ -201,6 +223,15 @@ def global_plt_style() -> None:
     plt.rcParams["xtick.color"] = "white"
     plt.rcParams["ytick.color"] = "white"
 
+def inject_mathjax() -> None:
+    components.html("""
+<script type="text/javascript"
+  async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+""", height=0)
+    
+
+
 
 def apply_all_styles() -> None:
     """Apply all styles at once."""
@@ -209,7 +240,9 @@ def apply_all_styles() -> None:
     set_header_style()
     set_image_style()
     remove_decoration()
+    remove_top_padding()
     global_plt_style()
+    inject_mathjax()
 
 # Functions to show custon components
 
