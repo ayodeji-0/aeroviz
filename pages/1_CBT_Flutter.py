@@ -356,26 +356,17 @@ with col1:
                     except Exception as e:
                         st.error(f"Parametric study failed: {str(e)}")
                         st.session_state.ps = None
-            show_study_results = st.toggle('Show Results', value=False, key='show_study_results_toggle')
-            # Display results if available and requested
-            if show_study_results:
-                if st.session_state.ps is not None and st.session_state.ps.results is not None:
-                    study_param_y = st.session_state.ps.results
-                else:
-                    st.info('No results available. Please run parametric study first!', icon="📊")
-            # with cont1_1_2:
-            #     st.markdown('<div class="column-header4">Parametric Study Results</div>', unsafe_allow_html=True)
-            #     buff = st.empty()
-            #     with buff:
-            #         st.info('Results will be displayed here!', icon="📊")
-            #         st.write(study_param_y)
-            
-            # st.write("""
-            #         *You can select multiple dependent variables to plot against the varying parameter.
-            #         """)    
+            ##No results to show for now
+            # show_study_results = st.toggle('Show Results', value=False, key='show_study_results_toggle')
+            # # Display results if available and requested
+            # if show_study_results:
+            #     if st.session_state.ps is not None and st.session_state.ps.results is not None:
+            #         study_param_y = st.session_state.ps.results
+            #     else:
+            #         st.info('No results available. Please run parametric study first!', icon="📊")
             
             
-
+        # Settings Tab
         with col1_tabs[3]:
             # Theory toggle - use a callback approach
             new_theory_state = st.toggle(
@@ -397,7 +388,10 @@ with col1:
                 properties['airfoil_color'] = st.color_picker('Airfoil Color', '#339999')
             with col1_2:
                 properties['annotated_text_color'] = st.color_picker('Annotation Color', '#000000')
-                
+            
+            # Number of modes to show
+            num_modes = st.slider('Number of Modes to Show', 1, 4, 1, 1, help="Select the number of modes to display in the animation.")
+
             properties['transparency'] = st.slider('Airfoil Transparency', 0.0, 1.0, 0.5, 0.01)
             properties['show_chord'] = st.toggle('Show Chord', value=True)
             properties['angled_text'] = st.toggle('Show Angled Text', value=True)
@@ -630,7 +624,7 @@ with col2:
                     if st.session_state.fa is not None and st.session_state.airfoil_obj is not None:
                         try:
                             # Create animation if analysis is complete and airfoil is generated
-                            anim = st.session_state.fa.animate_flutter(st.session_state.airfoil_obj.coords, duration, fps, properties=properties)
+                            anim = st.session_state.fa.animate_flutter(st.session_state.airfoil_obj.coords, duration, fps, properties=properties, n_modes=num_modes)
                             st.session_state.plots["Animation"] = anim
                             buff.empty()
                         except Exception as e:

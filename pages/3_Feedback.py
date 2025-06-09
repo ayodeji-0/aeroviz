@@ -2,8 +2,12 @@ import streamlit as st
 import datetime
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 from styles.stylesheet import apply_all_styles
-
+st.set_page_config(page_title="Feedback",
+                   page_icon=":memo:",  # Memo emoji for feedback
+                     layout="wide",  # Wide layout for more space
+)
 # Apply global styles
 apply_all_styles()
 
@@ -11,8 +15,11 @@ apply_all_styles()
 # Define your API access scope and authorize with your credentials file
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 
+key = st.secrets["google_credentials"]
+
 # 🔁 Placeholder: path to your downloaded Google Service Account key
-creds = ServiceAccountCredentials.from_json_keyfile_name("config/google_credentials.json", scope)
+# Use credentials from secrets
+creds = Credentials.from_service_account_info(st.secrets["google_credentials"], scopes=scope)
 client = gspread.authorize(creds)
 
 # 🔁 Placeholder: your Google Sheet name or URL
