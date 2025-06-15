@@ -54,7 +54,7 @@ ps_indep_dict: Dict[str, str] = {
 
 # Dictionary of all possible dependent variables for the parametric study
 ps_dep_dict: Dict[str, str] = {
-    'Aeroelastic Frequency · $\\omega/\omega_{\\theta}$': 'omega',
+    'Aeroelastic Frequency · $\\omega/\\omega_{\\theta}$': 'omega',
     'Damping Ratio · $\\zeta$': 'zeta',
     'Eigenvalues': 'vals',
     'Eigenvectors': 'vecs'
