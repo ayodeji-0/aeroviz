@@ -30,7 +30,7 @@ system_configuration: Dict[str, SystemConfigValue] = {
     'b': ['Semi-Chord Length · $b$', (0.1, 1.0, 0.01, 0.5), "Half the chord length of the airfoil. Used as a reference scale in defining motion and aerodynamic effects."],
     'e': ['Eccentricity · $e$', (-0.5, 1.0, 0.01, 0.0), "Position of the center of mass along the chord. Affects inertial coupling between bending and torsion."],
     'r': ['Radius of Gyration · $r$', (0.01, 1.0, 0.01, 0.5), "Non-dimensional measure of rotational inertia. Governs the blade’s resistance to angular acceleration."],
-    'w_theta': ['Torsional Vibration Frequency · $w_\\theta$', (0.0, 1000.0, 1.0, 100.0), "Natural frequency of torsional motion in a vacuum. Sets the time scale for torsional response."],
+    'w_theta': ['Torsional Vibration Frequency · $\\omega_\\theta$', (0.0, 1000.0, 1.0, 100.0), "Natural frequency of torsional motion in a vacuum. Sets the time scale for torsional response."],
 }              
 
 

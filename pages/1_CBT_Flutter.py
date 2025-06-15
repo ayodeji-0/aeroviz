@@ -22,15 +22,26 @@ apply_all_styles()
 if "airfoil_obj" not in st.session_state:
     st.session_state.airfoil_obj = None # Track changes in airfoil object
 
-
 if "show_preview" not in st.session_state:
     st.session_state.show_preview = True # Track changes in preview state - airfoil
 
 if "airfoil_params" not in st.session_state:
     st.session_state.airfoil_params = None  # Track changes in airfoil parameters
 
+if "airfoil_param_values" not in st.session_state:
+    # Store individual parameter values to persist between pill selections
+    st.session_state.airfoil_param_values = {
+        k: v[0][3] for k, v in airfoil_parameters.items()
+    }
+
 if "sys_params" not in st.session_state:
     st.session_state.sys_params = None  # To track changes in system config
+
+if "sys_param_values" not in st.session_state:
+    # Store individual parameter values to persist between pill selections
+    st.session_state.sys_param_values = {
+        k: v[1][3] for k, v in system_configuration.items()
+    }
 
 if "study_params" not in st.session_state:
     st.session_state.study_params = None  # To track changes in parametric study config
@@ -115,18 +126,19 @@ with col1:
         #         st.markdown(f'<div class="column-header3">NACA {max_camber}{camber_position}{thickness} Preview</div>', unsafe_allow_html=True)
         #         #st.write(f"Airfoil {max_camber}{camber_position}{thickness}")
         #         st.pyplot(st.session_state.airfoil_obj.plot(color=properties['airfoil_color']), use_container_width=True)#find plotly equivalent for interactive plot
-        with col1_tabs[0]:
-
+        with col1_tabs[0]:            
             airfoil_param = st.pills('Select Airfoil Parameters', airfoil_parameters.keys(), default=list(airfoil_parameters.keys())[:3], selection_mode='multi', key='airfoil_param_pills', help='Select the airfoil parameters to configure. You can select multiple parameters to adjust their values simultaneously.')
                     
-            # Initialize parameters with default values
-            max_camber = airfoil_parameters['Max Camber'][0][3]  # Default value
-            camber_position = airfoil_parameters['Camber Position'][0][3]  # Default value
-            thickness = airfoil_parameters['Thickness'][0][3]  # Default value
-            num_points = airfoil_parameters['Discretization'][0][3]  # Default value
-            length = airfoil_parameters['Length'][0][3]  # Default value
-            centrepos = airfoil_parameters['Centre Position'][0][3]  # Default value
-            current_airfoil = (max_camber, camber_position, thickness, num_points, length, centrepos)  # Store current airfoil parameters as a tuple
+            # Use the stored parameter values from session state
+            max_camber = st.session_state.airfoil_param_values['Max Camber']
+            camber_position = st.session_state.airfoil_param_values['Camber Position']
+            thickness = st.session_state.airfoil_param_values['Thickness']
+            num_points = st.session_state.airfoil_param_values['Discretization']
+            length = st.session_state.airfoil_param_values['Length']
+            centrepos = st.session_state.airfoil_param_values['Centre Position']
+            
+            # Create tuple from current values
+            current_airfoil = (max_camber, camber_position, thickness, num_points, length, centrepos)
 
             # Check if any parameters are selected in the pills
             if not airfoil_param:
@@ -135,10 +147,15 @@ with col1:
                 # For each parameter that is selected in the pills
                 for k, v in airfoil_parameters.items():
                     if k in airfoil_param:  # Check if this parameter is selected
-                        val = st.slider(k, v[0][0], v[0][1], v[0][3], v[0][2], help=v[1], key=k)
+                        # Use the stored value as the default instead of the original default
+                        val = st.slider(k, v[0][0], v[0][1], st.session_state.airfoil_param_values[k], v[0][2], help=v[1], key=f"airfoil_{k}")
+                        
+                        # Store the value back to session state
+                        st.session_state.airfoil_param_values[k] = val
+                        
                         # Update the tuple at the right position
                         param_index = list(airfoil_parameters.keys()).index(k)
-                        current_airfoil = current_airfoil[:param_index] + (val,) + current_airfoil[param_index+1:]                # Check if any parameter has changed
+                        current_airfoil = current_airfoil[:param_index] + (val,) + current_airfoil[param_index+1:]  # Check if any parameter has changed
             
             if st.session_state.airfoil_params is None or current_airfoil != st.session_state.airfoil_params:
                 st.session_state.airfoil_params = current_airfoil  # Just update parameters
@@ -166,7 +183,7 @@ with col1:
 
             # Display the preview only if airfoil is not None and user wants to see it
             if st.session_state.airfoil_obj is not None and show_preview:
-                st.markdown(f'<div class="column-header3">Airfoil {int(max_camber)}{int(camber_position)}{int(thickness)} Preview</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="column-header3">NACA {round(max_camber)}{round(camber_position)}{round(thickness)} Preview</div>', unsafe_allow_html=True)
                 st.pyplot(st.session_state.airfoil_obj.plot(color=properties['airfoil_color']), use_container_width=True)
                 #st.plotly_chart(st.session_state.airfoil_obj.plotly_plot(color=properties['airfoil_color']), use_container_width=True)
         
@@ -183,16 +200,15 @@ with col1:
                         default=param_names[:3],
                         key='sys_param_pills', 
                         help='Select the system parameters to configure. You can select multiple parameters to adjust their values simultaneously.')
-            
-        # Initialize system parameters with default values
-            mu = system_configuration['mu'][1][3]  # Default value
-            sigma = system_configuration['sigma'][1][3]  # Default value
-            V = system_configuration['V'][1][3]  # Default value
-            a = system_configuration['a'][1][3]
-            b = system_configuration['b'][1][3]
-            e = system_configuration['e'][1][3]
-            r = system_configuration['r'][1][3]
-            w_theta = system_configuration['w_theta'][1][3]
+              # Use the stored parameter values from session state
+            mu = st.session_state.sys_param_values['mu']
+            sigma = st.session_state.sys_param_values['sigma'] 
+            V = st.session_state.sys_param_values['V']
+            a = st.session_state.sys_param_values['a']
+            b = st.session_state.sys_param_values['b']
+            e = st.session_state.sys_param_values['e']
+            r = st.session_state.sys_param_values['r']
+            w_theta = st.session_state.sys_param_values['w_theta']
             mode = mode_options['Steady - State Space']  # Default mode
             
             # Create the current params tuple for comparison
@@ -213,7 +229,11 @@ with col1:
                 for k, v in system_configuration.items():
                     # Check if this parameter's display name is in the selected pills
                     if v[0] in sys_param:
-                        val = st.slider(v[0], v[1][0], v[1][1], v[1][3], v[1][2], help=v[0], key=k)
+                        val = st.slider(v[0], v[1][0], v[1][1], st.session_state.sys_param_values[k], v[1][2], help=v[0], key=f"sys_{k}")
+                        
+                        # Store the value back to session state
+                        st.session_state.sys_param_values[k] = val
+                        
                         # Update the tuple at the right position
                         param_index = list(system_configuration.keys()).index(k)
                         sys_params = sys_params[:param_index] + (val,) + sys_params[param_index+1:]
@@ -240,6 +260,7 @@ with col1:
                     with st.spinner("Computing flutter response..."):
                         st.session_state.fa = FlutterAnalysis(mu, sigma, V, a, b, e, r, mode, w_theta)
                         st.session_state.fa.compute_response()
+                        st.info('System Configured')
                 except Exception as e:
                     st.error(f"Flutter analysis failed: {str(e)}")
                     st.session_state.fa = None
@@ -312,7 +333,6 @@ with col1:
             #                 st.info('Results Loaded!', icon="✅")
             #             buff.empty()
 
-
         # Parametric Study Tab
         with col1_tabs[2]:
             
@@ -353,6 +373,7 @@ with col1:
                         with st.spinner("Running parametric study..."):
                             st.session_state.ps = ParametricStudy(study_param_x, min_val, max_val, step, study_param_y)
                             st.session_state.ps.run_study(sys_params=sys_params)
+                            st.info('Parametric Study Completed')
                     except Exception as e:
                         st.error(f"Parametric study failed: {str(e)}")
                         st.session_state.ps = None
@@ -364,7 +385,6 @@ with col1:
             #         study_param_y = st.session_state.ps.results
             #     else:
             #         st.info('No results available. Please run parametric study first!', icon="📊")
-            
             
         # Settings Tab
         with col1_tabs[3]:
@@ -401,7 +421,7 @@ with col1:
             st.session_state.anim_properties = properties
             #st.markdown('<div class="column-header2">Playback</div>', unsafe_allow_html=True)
             # Other animation properties - playback
-            duration = st.slider('Duration · s', 1, 10, 10, 1)
+            duration = st.slider('Duration · s', 1, 10, 5, 1)
             fps = st.slider('Frame Rate · fps', 0, 120, 30, 10)
             #st.write(f"Frame Count: {int(duration * fps)}")
 

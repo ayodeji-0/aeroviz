@@ -34,8 +34,8 @@ class Airfoil:
         # Input validation
         if not 0 <= max_camber <= 9.9:
             raise ValueError("max_camber must be between 0 and 9.9")
-        if not 0 <= camber_position <= 0.9:
-            raise ValueError("camber_position must be between 0 and 0.9")
+        if not 0 <= camber_position <= 9.0:
+            raise ValueError("camber_position must be between 0 and  9.0")
         if not 0 <= thickness <= 40:
             raise ValueError("thickness must be between 0 and 40")
         if num_points < 10:
