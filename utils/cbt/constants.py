@@ -6,7 +6,7 @@ SystemConfigValue = List[Union[str, Tuple[Number, Number, Number, Number], str]]
 
 
 airfoil_parameters = {
-    #e ach value is a list of a tuple of (min, max, step, default), help text
+    #each value is a list of a tuple of (min, max, step, default), help text
    
     'Max Camber': [(0.0, 9.5, 0.1, 0.0), "Maximum camber as a percentage of the chord. Controls the curvature of the mean camber line, affecting lift characteristics."],
     'Camber Position': [(0.0, 9.0, 0.1, 0.0), "Position along the chord where maximum camber occurs. Determines where the airfoil bends most."],

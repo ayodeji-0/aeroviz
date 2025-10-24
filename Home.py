@@ -84,16 +84,16 @@ with col2:
 
         column_header5("🛠️ Stack")
         st.markdown("""
-        - Python (NumPy, SciPy, Matplotlib etc.)
-        - Deployed in Streamlit
+        - Python (NumPy, Plotly, etc.)
+        - Deployed in Streamlit with Git-based version control
         - Utilizes OOP Frameworks with custom modules for PEP 8 compliance
+        - SciPy for advanced numerical routines
         """)
 
         column_header5("🔬 About / 📬 Contact")
         st.markdown("""
         - Part of an ME4 Individual Research Project at Imperial College London
         - Developed by Ayodeji Adeniyi
-        - Supervised by Dr. Sina Stapelfeldt , Department of Mechanical Engineering <add email>
-
+        - Supervised by Dr. Sina Stapelfeldt , Department of Mechanical Engineering s.stapelfeldt@imperial.ac.uk
         """)
 
