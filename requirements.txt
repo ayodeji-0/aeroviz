@@ -13,3 +13,7 @@ pillow>=9.0.0              # For image processing (safe default)
 # Google Sheets integration
 gspread>=5.11.0            # Latest stable as of 2024
 oauth2client==4.1.3        # This is the latest and only stable release
+
+# Custom modules
+modules[flutter]
+modules[lpm]
