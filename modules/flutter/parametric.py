@@ -10,7 +10,7 @@ import plotly.figure_factory as ff # for table and streamlines
 from plotly.subplots import make_subplots
 
 from .analysis import FlutterAnalysis
-from utils.cbt.constants import ps_indep_dict, ps_dep_dict
+from utils.flutter.constants import ps_indep_dict, ps_dep_dict
 
 class ParametricStudy:
     """Class to carry out parametric studies on flutter analysis."""

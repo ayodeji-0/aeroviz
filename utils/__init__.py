@@ -2,7 +2,7 @@
 AeroViz utilities package.
 """
 
-from .cbt import (
+from .flutter import (
     ps_indep_dict,
     ps_dep_dict,
     PlotParams,

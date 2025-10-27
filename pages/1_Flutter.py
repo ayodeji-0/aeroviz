@@ -1,10 +1,16 @@
+
+import sys
 import streamlit as st
 
+# go one level up
+
+sys.path.append('..')
+
 # Import modules
-from modules.cbt_flutter.airfoil import Airfoil
-from modules.cbt_flutter.analysis import FlutterAnalysis
-from modules.cbt_flutter.parametric import ParametricStudy
-from utils.cbt.constants import *
+from modules.flutter.airfoil import Airfoil
+from modules.flutter.analysis import FlutterAnalysis
+from modules.flutter.parametric import ParametricStudy
+from utils.flutter.constants import *
 from styles.stylesheet import apply_all_styles
 
 # Page Config
