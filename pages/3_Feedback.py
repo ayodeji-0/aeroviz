@@ -91,7 +91,8 @@ st.markdown("### Frequently Asked Questions")
 with st.expander('In Progress Hotfixes'):
     st.write("""
     - **Plot Latex Rendering**: Support for rendering LaTeX in plots using some javascript injection.
-    """)
+    - **AskAero Integration**: Integrating AskAero for enhanced Q&A capabilities within the app cannot be done through streamlit due to deployment limitations.
+             """)
 with st.expander('Incoming Features'):
     st.write("""
     - **Feature Request Tracking**: A public system to track the status of feature requests.

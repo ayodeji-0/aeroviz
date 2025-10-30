@@ -1,6 +1,6 @@
 import streamlit as st
-from modules.lpm.blisk import Blisk
-from modules.lpm.analysis import BliskAnalysis
+from lpm.blisk import Blisk
+from lpm.analysis import BliskAnalysis
 from utils.blisks.constants import materials
 from styles.stylesheet import apply_all_styles
 
