@@ -2,22 +2,10 @@
 
 import streamlit as st
 
-# go one level up
-
-# ...existing code...
-import sys
-from pathlib import Path
-
-# Ensure repo root is on sys.path so `modules.*` imports work in deployed environments
-repo_root = Path(__file__).resolve().parents[1]  # repo root (/workspaces/aeroviz)
-if str(repo_root) not in sys.path:
-    sys.path.insert(0, str(repo_root))
-
-# ...existing code...
 # Import modules
-from modules.flutter.airfoil import Airfoil
-from modules.flutter.analysis import FlutterAnalysis
-from modules.flutter.parametric import ParametricStudy
+from flutter.airfoil import Airfoil
+from flutter.analysis import FlutterAnalysis
+from flutter.parametric import ParametricStudy
 from utils.flutter.constants import *
 from styles.stylesheet import apply_all_styles
 
