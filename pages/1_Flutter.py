@@ -50,8 +50,8 @@ if "study_params" not in st.session_state:
 
 if "anim_properties" not in st.session_state:
     st.session_state.anim_properties = {
-        "airfoil_color": "#ffffff",
-        "transparency": 0.5,
+        "airfoil_color": "#000000",
+        "transparency": 0.5, 
     }
 
 properties = st.session_state.anim_properties  # Get properties at top level
@@ -663,8 +663,9 @@ with col2:
                 if st.session_state.plots["Animation"] is not None:
                     st.markdown('<div class="column-header3">Animation</div>', unsafe_allow_html=True)
                     st.components.v1.html(st.session_state.plots["Animation"], width=cont2_width, height=cont_height, scrolling=True)
+                    #rst.pyplot(anim, use_container_width=True)
 
-
+                #st.session_state.fa.debug_static_foil(st.session_state.airfoil_obj.coords)
 ## Theory
 if st.session_state.show_theory and col3 is not None:
     with col3:

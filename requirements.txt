@@ -2,6 +2,9 @@
 streamlit>=1.28.0         # Safe & feature-rich
 IPython>=8.0.0             # For interactive plots (safe default)
 
+# Data Structures
+typing>=3.10.0              
+
 # Core numerical + plotting
 numpy>=1.24.0              # Compatible with pandas 2+
 matplotlib>=3.7.0          # Works with Streamlit & plotly

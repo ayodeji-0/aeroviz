@@ -12,6 +12,8 @@ import plotly.express as px
 import plotly.figure_factory as ff # for table and streamlines
 from plotly.subplots import make_subplots
 
+from typing import Union, Dict
+
 class FlutterAnalysis:
     """
     Class to represent flutter analysis for a coupled system.
@@ -194,613 +196,325 @@ class FlutterAnalysis:
             
             return fig
     
-    
-    # def animate_flutter(self, airfoil_coords, duration=10, fps=30, scale=1.0, properties=None):
-    #     """
-    #     Animate the flutter response showing airfoil motion.
+    def animate_flutter(
+        self,
+        airfoil_coords,
+        duration: float = 6,
+        fps: int = 30,
+        scale: float = 1.0,
+        n_modes: int = 1,
+        properties: Dict = None,
+        debug: bool = False,
+    ):
+        """
+        One-axes animation of the airfoil (plunge + twist). No subplots.
 
-    #     airfoil_coords:  (N,2) array of the nominal airfoil coordinates in a "chord" frame,
-    #                     e.g. x ∈ [0, 1], y ∈ [–0.1, +0.1].
-    #     scale:           a scalar to resize those coords on‐screen.
-    #     properties:      dict with keys:
-    #                     - 'airfoil_color':   color string for facecolor
-    #                     - 'transparency':    between 0–100 (percent opacity)
-    #                     - 'show_chord':      bool, whether to draw the chord line
-    #     """
-
-    #     # Default properties if None
-    #     if properties is None:
-    #         properties = {
-    #             'airfoil_color': '#ffffff',
-    #             'transparency': 50,
-    #             'show_chord': True
-    #         }
-
-    #     # Progress bar in Streamlit
-    #     anim_bar = st.progress(0, text="Rendering Animation...")
-    #     self.progress_bar = anim_bar
-
-    #     # Make sure we have eigen‐stuff computed
-    #     if getattr(self, 'vals', None) is None or getattr(self, 'vecs', None) is None:
-    #         self.compute_response()
-
-    #     # Extract the first four eigen‐pairs
-    #     lambda_vals = self.vals[:4]              # shape (4,)
-    #     real_parts = np.real(lambda_vals)        # damping “gamma”
-    #     imag_parts = np.imag(lambda_vals)        # frequency “omega”
-
-    #     # Eigenvectors: assume vecs shape is (2, M) or (n,4)
-    #     # Here we take the first 4 modes: row 0 = plunge shape, row 1 = torsion shape
-    #     h_tidals = np.real(self.vecs[0, :4]) * self.b      # real “plunge” amplitude scaled by semi‐chord
-    #     theta_tidals = np.real(self.vecs[1, :4])           # real “twist” amplitude
-
-    #     # Phase difference between plunge & pitch
-    #     phase_diffs = np.angle(self.vecs[1, :4] / self.vecs[0, :4])
-
-    #     # Time‐axis
-    #     t = np.linspace(0, duration, int(duration * fps))
-
-    #     # 1) Prepare “centered + scaled” airfoil coordinates
-    #     #    Here we assume `airfoil_coords` is something like a (N,2) array
-    #     #    with x-values from 0 to 1, y-values from –something..+something.
-    #     #    We want to shift it so that its quarter‐chord (or elastic axis) is at x=0.
-    #     #    Let’s assume the nominal “chord” is max(x)–min(x). We can center around its midpoint.
-    #     coords = np.array(airfoil_coords) * scale
-
-    #     # Center about the mean chord location: find mid‐chord
-    #     x_coords = coords[:, 0]
-    #     mid_chord = 0.5 * (x_coords.max() + x_coords.min())
-    #     coords[:, 0] -= mid_chord
-
-    #     # Now coords are roughly centered around x=0. If you want the elastic axis at x=a,
-    #     # you can add +self.a to these x‐values and then rotate around that same point.
-    #     coords[:, 0] += self.a
-
-    #     # 2) Set up the figure with 4 rows, 2 columns
-    #     fig, axes = plt.subplots(
-    #         nrows=4, ncols=2,
-    #         figsize=(8, 8),
-    #         gridspec_kw={'width_ratios': [1.2, 1]}
-    #     )
-    #     fig.suptitle("Coupled Flutter Modes ‐ Time Response", fontsize=14)
-
-    #     # 3) Precompute plunge & twist histories
-    #     h_t = np.array([
-    #         h_tidals[i] * np.exp(real_parts[i] * t) * np.cos(imag_parts[i] * t)
-    #         for i in range(4)
-    #     ])
-    #     theta_t = np.array([
-    #         theta_tidals[i] * np.exp(real_parts[i] * t) * np.cos(imag_parts[i] * t + phase_diffs[i])
-    #         for i in range(4)
-    #     ])
-
-    #     # 4) Create one Polygon patch per mode, **in its “zero‐deflection”** position
-    #     airfoil_patches = []
-    #     for i in range(4):
-    #         patch = Polygon(
-    #             coords,
-    #             closed=True,
-    #             edgecolor='k',
-    #             facecolor=properties['airfoil_color'],
-    #             alpha=properties['transparency'] / 100.0
-    #         )
-    #         # Add it to the left‐column axes
-    #         axes[i, 0].add_patch(patch)
-
-    #         # Draw chord line if requested
-    #         if properties.get('show_chord', False):
-    #             chord_y0 = coords[:, 1].mean()
-    #             axes[i, 0].plot(
-    #                 [coords[:, 0].min(), coords[:, 0].max()],
-    #                 [chord_y0, chord_y0],
-    #                 'k--', lw=0.8
-    #             )
-
-    #         # Set a symmetric view window around x=0
-    #         span = 1.5 * self.b
-    #         axes[i, 0].set_xlim(-span + self.a, span + self.a)
-    #         axes[i, 0].set_ylim(-span, span)
-    #         axes[i, 0].set_aspect('equal')
-    #         axes[i, 0].set_title(f"Mode {i+1} Animation")
-    #         airfoil_patches.append(patch)
-
-    #     # 5) On the right column, plot the time histories of h_t and theta_t
-    #     for i in range(4):
-    #         axes[i, 1].plot(t, h_t[i], 'b-', label=f"Mode {i+1} Plunge")
-    #         axes[i, 1].plot(t, theta_t[i], 'r--', label=f"Mode {i+1} Twist")
-    #         axes[i, 1].set_xlabel("Time [s]")
-    #         axes[i, 1].set_ylabel("Displacement")
-    #         axes[i, 1].legend(fontsize=8)
-    #         axes[i, 1].grid(True)
-    #         axes[i, 1].set_title(f"Mode {i+1} Amplitude")
-
-    #     # 6) Animation update function: rotate about (self.a,0) & translate in y by h_t
-    #     def update(frame):
-    #         # Update progress bar
-    #         pct = int((frame / len(t)) * 100)
-    #         elapsed = frame / fps
-    #         self.progress_bar.progress(
-    #             pct,
-    #             text=f"Time Elapsed: {elapsed:0.1f}s  (Rendering…)"
-    #         )
-
-    #         for i in range(4):
-    #             # Build a composite Affine2D: first rotate around (self.a, 0),
-    #             # then translate vertically by h_t[i,frame].
-    #             rot = transforms.Affine2D().rotate_around(
-    #                 self.a, 0.0,
-    #                 theta_t[i, frame]  # already in radians
-    #             )
-    #             trans = rot.translate(0.0, h_t[i, frame]) + axes[i, 0].transData
-
-    #             airfoil_patches[i].set_transform(trans)
-
-    #         return airfoil_patches
-
-    #     # 7) Create the FuncAnimation
-    #     ani = FuncAnimation(
-    #         fig,
-    #         update,
-    #         frames=len(t),
-    #         blit=True,
-    #         interval=1000 / fps
-    #     )
-
-    #     # 8) Once done, clear the progress bar and return the HTML for Streamlit
-    #     anim_html = ani.to_jshtml()
-    #     self.progress_bar.empty()
-    #     plt.close(fig)   # close the figure so it doesn’t display twice
-
-    #     return anim_html
-    # def animate_flutter(self, airfoil_coords, duration=10, fps=30, properties=None):
-    #     """
-    #     Animate the flutter response showing airfoil motion.
-    #     """
-    #     if properties is None:
-    #         properties = {
-    #             'airfoil_color': '#ffffff',
-    #             'transparency': 50,
-    #             'show_chord': True
-    #         }
-
-    #     anim_bar = st.progress(0, text="Rendering Animation...")
-    #     self.progress_bar = anim_bar
-
-    #     if self.vals is None:
-    #         self.compute_response()
-
-    #     # Extract eigenvalues and eigenvectors
-    #     lambda_vals = self.vals[:4]
-    #     real_parts = np.real(lambda_vals)
-    #     imag_parts = np.imag(lambda_vals)
-        
-    #     h_tidals = np.real(self.vecs[0, :4]) * self.b
-    #     theta_tidals = np.real(self.vecs[1, :4])
-    #     phase_diffs = np.angle(self.vecs[1, :4] / self.vecs[0, :4])
-
-    #     t = np.linspace(0, duration, duration * fps)
-
-    #     # Setup figure
-    #     fig, axes = plt.subplots(4, 2, figsize=(8, 8))
-    #     fig.suptitle("Coupled Flutter Modes - Time Response", fontsize=14)
-
-    #     # Create airfoil patches
-    #     airfoil_patches = []
-    #     for i in range(4):
-    #         patch = Polygon(airfoil_coords, closed=True, edgecolor='k', 
-    #                       facecolor=properties['airfoil_color'], 
-    #                       alpha=properties['transparency']/100)
-    #         axes[i, 0].add_patch(patch)
-    #         axes[i, 0].set_xlim(-1.5 * self.b, 1.5 * self.b)
-    #         axes[i, 0].set_ylim(-1.5 * self.b, 1.5 * self.b)
-    #         axes[i, 0].set_aspect('equal')
-    #         axes[i, 0].set_title(f"Mode {i+1} Animation")
-    #         airfoil_patches.append(patch)
-
-    #     # Compute displacements
-    #     h_t = np.array([
-    #         h_tidals[i] * np.exp(real_parts[i] * t) * np.cos(imag_parts[i] * t)
-    #         for i in range(4)
-    #     ])
-
-    #     theta_t = np.array([
-    #         theta_tidals[i] * np.exp(real_parts[i] * t) * np.cos(imag_parts[i] * t + phase_diffs[i])
-    #         for i in range(4)
-    #     ])
-
-    #     # Plot displacement histories
-    #     for i in range(4):
-    #         axes[i, 1].plot(t, h_t[i], 'b-', label=f"Mode {i+1} Plunge")
-    #         axes[i, 1].plot(t, theta_t[i], 'r--', label=f"Mode {i+1} Twist")
-    #         axes[i, 1].set_xlabel("Vibration Period")
-    #         axes[i, 1].set_ylabel("Displacement")
-    #         axes[i, 1].legend()
-    #         axes[i, 1].grid()
-    #         axes[i, 1].set_title(f"Mode {i+1} Amplitude & Phase")
-
-    #     def update(frame):
-    #         progress = int((frame / len(t)) * 100)
-    #         self.progress_bar.progress(progress, text=f"Time Elapsed: {int(frame/fps)}s\nRendering Animation...")
-            
-    #         for i in range(4):
-    #             trans = transforms.Affine2D().rotate_deg_around(
-    #                 self.a, 0, np.degrees(theta_t[i, frame])
-    #             ).translate(0, h_t[i, frame]) + axes[i, 0].transData
-    #             airfoil_patches[i].set_transform(trans)
-            
-    #         return airfoil_patches
-
-    #     ani = FuncAnimation(fig, update, frames=len(t), blit=True, interval=1000/fps)
-    #     anim = ani.to_jshtml()
-    #     self.progress_bar.empty()
-        
-    #     return anim
-
-    # def animate_flutter(self, airfoil_coords, duration=10, fps=30, scale=1.0, n_modes=4, properties=None):
-    #     """
-    #     Animate the flutter response showing airfoil motion.
-
-    #     Parameters:
-    #     -----------
-    #     airfoil_coords : array
-    #         (N,2) array of the nominal airfoil coordinates in a "chord" frame,
-    #         e.g. x ∈ [0, 1], y ∈ [–0.1, +0.1].
-    #     duration : float, optional
-    #         Animation duration in seconds, default 10
-    #     fps : int, optional
-    #         Frames per second, default 30
-    #     scale : float, optional
-    #         Scalar to resize coordinates on-screen, default 1.0
-    #     n_modes : int, optional
-    #         Number of modes to display (1-4), default 4
-    #     properties : dict, optional
-    #         Dictionary with visualization properties:
-    #         - 'airfoil_color': color string for facecolor (default '#ffffff')
-    #         - 'transparency': between 0-100 (percent opacity) (default 50)
-    #         - 'show_chord': bool, whether to draw chord line (default True)
-    #         - 'angled_text': bool, whether to angle mode labels (default False)
-    #         - 'annotated_text_color': color for text annotations (default 'black')
-
-    #     Returns:
-    #     --------
-    #     str: HTML string containing the animation for Streamlit display
-    #     """
-    #     # Ensure n_modes is between 1 and 4
-    #     n_modes = max(1, min(4, n_modes))
-        
-    #     # Default properties if None
-    #     if properties is None:
-    #         properties = {
-    #             'airfoil_color': '#ffffff',
-    #             'transparency': 50,
-    #             'show_chord': True,
-    #             'angled_text': False,
-    #             'annotated_text_color': 'black'
-    #         }
-
-    #     # Progress bar in Streamlit
-    #     anim_bar = st.progress(0, text="Rendering Animation...")
-    #     self.progress_bar = anim_bar
-
-    #     # Make sure we have eigenvalues computed
-    #     if getattr(self, 'vals', None) is None or getattr(self, 'vecs', None) is None:
-    #         self.compute_response()
-
-    #     # Extract the eigenvalues and eigenvectors for the modes
-    #     lambda_vals = self.vals[:n_modes]           # shape (n_modes,)
-    #     real_parts = np.real(lambda_vals)           # damping "gamma"
-    #     imag_parts = np.imag(lambda_vals)           # frequency "omega"
-
-    #     # Extract the eigenvectors
-    #     h_tidals = np.real(self.vecs[0, :n_modes]) * self.b   # plunge amplitude
-    #     theta_tidals = np.real(self.vecs[1, :n_modes])        # twist amplitude
-
-    #     # Phase difference between plunge & pitch
-    #     phase_diffs = np.angle(self.vecs[1, :n_modes] / self.vecs[0, :n_modes])
-
-    #     # Time axis
-    #     t = np.linspace(0, duration, int(duration * fps))
-
-    #     # Prepare airfoil coordinates
-    #     coords = np.array(airfoil_coords) * scale
-
-    #     # Center about the mean chord location
-    #     x_coords = coords[:, 0]
-    #     mid_chord = 0.5 * (x_coords.max() + x_coords.min())
-    #     coords[:, 0] -= mid_chord
-
-    #     # Shift so elastic axis is at x=a
-    #     coords[:, 0] += self.a
-
-    #     # Set up the figure with n_modes rows, each with a 1:2 grid
-    #     # Left column: animation, Right column: two stacked plots
-    #     fig = plt.figure(figsize=(12, 3.5 * n_modes))
-    #     gs = fig.add_gridspec(n_modes, 3, width_ratios=[2, 1, 1])
-        
-    #     fig.suptitle("Coupled Flutter Modes - Time Response", fontsize=14)
-    #     fig.patch.set_facecolor('none')
-    #     fig.patch.set_alpha(0)
-        
-    #     # Precompute displacement histories
-    #     h_t = np.array([
-    #         h_tidals[i] * np.exp(real_parts[i] * t) * np.cos(imag_parts[i] * t)
-    #         for i in range(n_modes)
-    #     ])
-    #     theta_t = np.array([
-    #         theta_tidals[i] * np.exp(real_parts[i] * t) * np.cos(imag_parts[i] * t + phase_diffs[i])
-    #         for i in range(n_modes)
-    #     ])
-
-    #     # Lists to store all animation objects
-    #     airfoil_patches = []
-    #     time_lines = []
-    #     phase_points = []
-        
-    #     # Create subplots and initialize plots
-    #     for i in range(n_modes):
-    #         # Animation subplot (left)
-    #         ax_anim = fig.add_subplot(gs[i, 0])
-            
-    #         # Create polygon patch for airfoil
-    #         patch = Polygon(
-    #             coords,
-    #             closed=True,
-    #             edgecolor='k',
-    #             facecolor=properties['airfoil_color'],
-    #             alpha=properties['transparency'] / 100.0
-    #         )
-    #         ax_anim.add_patch(patch)
-    #         airfoil_patches.append(patch)
-            
-    #         # Draw chord line if requested
-    #         if properties.get('show_chord', True):
-    #             chord_y0 = coords[:, 1].mean()
-    #             ax_anim.plot(
-    #                 [coords[:, 0].min(), coords[:, 0].max()],
-    #                 [chord_y0, chord_y0],
-    #                 'k--', lw=0.8
-    #             )
-            
-    #         # Set view limits
-    #         span = 1.5 * self.b
-    #         ax_anim.set_xlim(-span + self.a, span + self.a)
-    #         ax_anim.set_ylim(-span, span)
-    #         ax_anim.set_aspect('equal')
-    #         ax_anim.set_title(f"Mode {i+1} Animation")
-    #         ax_anim.grid(True, alpha=0.3)
-            
-    #         # Add elastic axis marker
-    #         ax_anim.plot([self.a], [0], 'ro', markersize=4)
-            
-    #         # Mode parameters text
-    #         mode_text = (f"ω = {abs(imag_parts[i]):.2f}, "
-    #                     f"γ = {real_parts[i]:.2f}")
-    #         ax_anim.text(0.02, 0.98, mode_text, transform=ax_anim.transAxes,
-    #                     va='top', ha='left', fontsize=10,
-    #                     bbox=dict(facecolor='white', alpha=0.7))
-            
-    #         # Displacement history subplot (right top)
-    #         ax_disp = fig.add_subplot(gs[i, 1])
-    #         ax_disp.plot(t, h_t[i], 'b-', label="Plunge")
-    #         ax_disp.plot(t, theta_t[i], 'r--', label="Twist")
-    #         ax_disp.set_title(f"Mode {i+1} Displacement")
-    #         ax_disp.set_xlabel("Time [s]")
-    #         ax_disp.set_ylabel("Displacement")
-    #         ax_disp.legend(fontsize=8)
-    #         ax_disp.grid(True)
-            
-    #         # Add time indicator for displacement plot
-    #         time_line = ax_disp.axvline(x=0, color='k', linestyle='-', alpha=0.3)
-    #         time_lines.append(time_line)
-            
-    #         # Phase portrait subplot (right bottom)
-    #         ax_phase = fig.add_subplot(gs[i, 2])
-    #         ax_phase.plot(h_t[i], theta_t[i], 'g-')
-    #         ax_phase.set_title(f"Mode {i+1} Phase Portrait")
-    #         ax_phase.set_xlabel("Plunge (h)")
-    #         ax_phase.set_ylabel("Twist (θ)")
-    #         ax_phase.grid(True)
-            
-    #         # Add current point for phase plot
-    #         phase_point, = ax_phase.plot([], [], 'go', markersize=6)
-    #         phase_points.append(phase_point)
-
-    #     # Animation update function
-    #     def update(frame):
-    #         # Update progress bar
-    #         pct = int((frame / len(t)) * 100)
-    #         elapsed = frame / fps
-    #         self.progress_bar.progress(
-    #             pct,
-    #             text=f"Time Elapsed: {elapsed:0.1f}s  (Rendering...)"
-    #         )
-            
-    #         # List to store all updated artists
-    #         artists = []
-            
-    #         # Update each mode's visuals
-    #         for i in range(n_modes):
-    #             # Create transformation for airfoil
-    #             rotation = transforms.Affine2D().rotate_around(
-    #                 self.a, 0.0, 
-    #                 theta_t[i, frame]
-    #             )
-    #             translation = rotation + transforms.Affine2D().translate(0, h_t[i, frame])
-                
-    #             # Apply transformation to airfoil patch
-    #             airfoil_patches[i].set_transform(translation + fig.gca().transData)
-    #             artists.append(airfoil_patches[i])
-                
-    #             # Update time indicator line
-    #             time_lines[i].set_xdata([t[frame], t[frame]])
-    #             artists.append(time_lines[i])
-                
-    #             # Update phase point
-    #             phase_points[i].set_data([h_t[i, frame]], [theta_t[i, frame]])
-    #             artists.append(phase_points[i])
-            
-    #         return artists
-
-    #     # Create animation with explicit artist specification
-    #     ani = FuncAnimation(
-    #         fig,
-    #         update,
-    #         frames=len(t),
-    #         blit=True,
-    #         interval=1000 / fps
-    #     )
-
-    #     # Apply tight layout before animation
-    #     plt.tight_layout()
-    #     plt.subplots_adjust(top=0.92)  # Adjust for suptitle
-
-    #     # Generate HTML and clean up
-    #     plt.rcParams['animation.embed_limit'] = 2**128  # Set a very high embed limit
-    #     anim_html = ani.to_jshtml()
-    #     self.progress_bar.empty()
-    #     plt.close(fig)  # Prevent double display
-
-    #     return anim_html
-
-
-    def animate_flutter(self,
-                        airfoil_coords,
-                        duration=10,
-                        fps=30,
-                        scale=1.0,
-                        n_modes=4,
-                        properties=None):
-        # … your docstring & default‐props omitted for brevity …
-
-        # 1) Prepare data & eigen‐stuff
-        if properties is None:
-            properties = {
-                'airfoil_color': '#ffffff',
-                'transparency': 50,
-                'show_chord': True
-            }
-        if getattr(self, 'vals', None) is None:
+        Returns
+        -------
+        str : HTML for Streamlit (ani.to_jshtml()).
+        """
+        # ---- guard / defaults ----
+        n_modes = max(1, int(n_modes))
+        if getattr(self, "vals", None) is None or getattr(self, "vecs", None) is None:
             self.compute_response()
 
-        lambda_vals = self.vals[:n_modes]
-        real_parts = np.real(lambda_vals)
-        imag_parts = np.imag(lambda_vals)
+        # Extract first n_modes safely
+        n_avail = min(n_modes, len(self.vals))
+        lam = self.vals[:n_avail]
+        g = np.real(lam)             # damping
+        w = np.imag(lam)             # frequency
 
-        h_tidals = np.real(self.vecs[0, :n_modes]) * self.b
-        theta_tidals = np.real(self.vecs[1, :n_modes])
-        phase_diffs = np.angle(self.vecs[1, :n_modes] / self.vecs[0, :n_modes])
+        # State-space eigenvectors: assume state = [h, theta, hdot, thetadot]
+        h_amp     = np.real(self.vecs[0, :n_avail]) * self.b
+        theta_amp = np.real(self.vecs[1, :n_avail])
+        with np.errstate(divide="ignore", invalid="ignore"):
+            phi = np.angle(self.vecs[1, :n_avail] / self.vecs[0, :n_avail])
+        phi = np.nan_to_num(phi)
 
-        t = np.linspace(0, duration, int(duration * fps))
+        # Time
+        n_frames = max(2, int(duration * fps))
+        t = np.linspace(0.0, duration, n_frames)
 
-        # 2) Center & scale airfoil coords so chord‐midpoint sits at x=self.a
-        coords = np.array(airfoil_coords) * scale
-        mid = 0.5 * (coords[:,0].max() + coords[:,0].min())
-        coords[:,0] = coords[:,0] - mid + self.a
+        # Histories = sum of selected modes
+        h_t  = np.sum([h_amp[i]     * np.exp(g[i]*t) * np.cos(w[i]*t)              for i in range(n_avail)], axis=0)
+        th_t = np.sum([theta_amp[i] * np.exp(g[i]*t) * np.cos(w[i]*t + phi[i])     for i in range(n_avail)], axis=0)
 
-        # 3) Precompute time‐histories
-        h_t = np.array([ h_tidals[i] * np.exp(real_parts[i]*t) *
-                        np.cos(imag_parts[i]*t) for i in range(n_modes) ])
-        theta_t = np.array([ theta_tidals[i] * np.exp(real_parts[i]*t) *
-                            np.cos(imag_parts[i]*t + phase_diffs[i])
-                            for i in range(n_modes) ])
+        # ---- base geometry, centered around elastic axis ----
+        base = np.asarray(airfoil_coords, float) * scale           # (N,2)
+        # Center by mid-chord then move so pivot is at (self.a, 0)
+        xmid = 0.5*(base[:,0].max() + base[:,0].min())
+        base[:,0] -= xmid
+        base[:,0] += self.a
 
-        # 4) Set up subplots
-        fig, axes = plt.subplots(
-            nrows=n_modes, ncols=3,
-            figsize=(12, 3*n_modes),
-            gridspec_kw={'width_ratios':[2,1,1]}
+        # Relative to pivot for rotation
+        x_rel0 = base[:,0] - self.a
+        y_rel0 = base[:,1].copy()
+
+        # ---- view box computed from geometry + motion ----
+        x_min, x_max = base[:,0].min(), base[:,0].max()
+        y_min, y_max = base[:,1].min(), base[:,1].max()
+        chord = max(1e-12, x_max - x_min)               # chord length in current units
+        geom_span = max(chord, (y_max - y_min))
+        plunge_pad = float(np.nanmax(np.abs(h_t))) if np.isfinite(h_t).any() else 0.0
+        span = 0.7*geom_span + plunge_pad               # zoom factor; tweak 0.7→0.5 for tighter view
+        span = max(span, 0.1*geom_span, 1e-6)
+
+        # ---- figure ----
+        fig, ax = plt.subplots(figsize=(6, 6))
+        ax.set_aspect("equal", "box")
+        ax.grid(True, alpha=0.3)
+        ax.set_title("Airfoil motion (plunge + twist)")
+
+        # Center view around pivot
+        ax.set_xlim(self.a - 1.2*span, self.a + 1.2*span)
+        ax.set_ylim(-1.2*span, 1.2*span)
+
+        # Force a visible style (ignore rcParams and any white-on-white surprises)
+        patch = Polygon(
+            base,
+            closed=True,
+            facecolor=properties["airfoil_color"],         # force bright fill
+            edgecolor="k",
+            linewidth=2.0,
+            alpha=properties["transparency"],               # fully opaque to avoid background blending issues
+            zorder=5,
         )
-        fig.suptitle("Coupled Flutter Modes – Time Response", fontsize=14)
+        ax.add_patch(patch)
 
-        # Keep references to all “dynamic” artists & their axes
-        airfoil_patches = []
-        anim_axes = []
-        time_lines = []
-        phase_points = []
+        # Optional chord line + pivot marker
+        if True:
+            chord_y = base[:,1].mean()
+            ax.plot([base[:,0].min(), base[:,0].max()], [chord_y, chord_y], "k--", lw=1.0, zorder=6)
+        ax.plot(self.a, 0.0, "ko", ms=5, zorder=7)
 
-        span = 1.5 * self.b
+        # Debug overlays: raw vertices and bounding box
+        if debug:
+            ax.scatter(base[:,0], base[:,1], s=8, c="blue", zorder=8)
+            ax.add_patch(Polygon(
+                np.array([[x_min,y_min],[x_max,y_min],[x_max,y_max],[x_min,y_max]]),
+                fill=False, edgecolor="green", linestyle="--", linewidth=1.0, zorder=4
+            ))
 
-        for i in range(n_modes):
-            # — Animation panel —
-            axA = axes[i,0]
-            patch = Polygon(coords, closed=True,
-                            facecolor=properties['airfoil_color'],
-                            edgecolor='k',
-                            alpha=properties['transparency']/100.)
-            axA.add_patch(patch)
-            if properties['show_chord']:
-                chord_y = coords[:,1].mean()
-                axA.plot([coords[:,0].min(), coords[:,0].max()],
-                        [chord_y, chord_y], 'k--', lw=0.7)
+        # ---- Streamlit progress (coarse) ----
+        bar = st.progress(0, text="Rendering animation…")
 
-            axA.set_xlim(self.a - span, self.a + span)
-            axA.set_ylim(-span, span)
-            axA.set_aspect('equal')
-            axA.set_title(f"Mode {i+1} Animation")
-            axA.grid(alpha=0.3)
-
-            airfoil_patches.append(patch)
-            anim_axes.append(axA)
-
-            # — Displacement vs time —
-            axD = axes[i,1]
-            axD.plot(t, h_t[i], 'b-', label='Plunge')
-            axD.plot(t, theta_t[i], 'r--', label='Twist')
-            axD.set_title(f"Mode {i+1} Displacement")
-            axD.set_xlabel("Time [s]")
-            axD.legend(fontsize=8)
-            axD.grid(alpha=0.3)
-            line = axD.axvline(0, color='k', alpha=0.3)
-            time_lines.append(line)
-
-            # — Phase portrait —
-            axP = axes[i,2]
-            axP.plot(h_t[i], theta_t[i], 'g-')
-            axP.set_title(f"Mode {i+1} Phase")
-            axP.set_xlabel("h")
-            axP.set_ylabel("θ")
-            axP.grid(alpha=0.3)
-            pt, = axP.plot([], [], 'go', markersize=5)
-            phase_points.append(pt)
-
-        # 5) Update function
+        # ---- update: rotate & translate vertices directly ----
         def update(frame):
-            artists = []
-            for j in range(n_modes):
-                ax = anim_axes[j]
-                # Build rotation about (self.a, 0) then translation in y
-                trans = (transforms.Affine2D()
-                        .rotate_around(self.a, 0, theta_t[j,frame])
-                        .translate(0, h_t[j,frame])
-                        + ax.transData)
-                airfoil_patches[j].set_transform(trans)
-                artists.append(airfoil_patches[j])
+            if frame % max(1, n_frames // 20) == 0:
+                pct = int(100 * frame / (n_frames - 1))
+                bar.progress(pct, text=f"Rendering animation… ({pct}%)")
 
-                # move the time-line
-                time_lines[j].set_xdata([t[frame], t[frame]])
-                artists.append(time_lines[j])
+            theta = th_t[frame]
+            h = h_t[frame]
+            c, s = np.cos(theta), np.sin(theta)
 
-                # move the phase point
-                phase_points[j].set_data([h_t[j,frame]], [theta_t[j,frame]])
-                artists.append(phase_points[j])
+            x = c * x_rel0 - s * y_rel0 + self.a
+            y = s * x_rel0 + c * y_rel0 + h
 
-            return artists
+            patch.set_xy(np.column_stack((x, y)))
+            return (patch,)
 
-        # 6) Animate
-        ani = FuncAnimation(
-            fig, update, frames=len(t),
-            interval=1000/fps, blit=True
-        )
+        ani = FuncAnimation(fig, update, frames=n_frames, interval=1000/fps, blit=True)
         plt.tight_layout()
-        plt.subplots_adjust(top=0.90)
+        plt.rcParams["animation.embed_limit"] = 2**128
 
-        # 7) Streamlit progress + export
-        bar = st.progress(0, text="Rendering Animation...")
-        self.progress_bar = bar
-
-        plt.rcParams['animation.embed_limit'] = 2**128
         html = ani.to_jshtml()
-        self.progress_bar.empty()
+        bar.progress(100, text="Done.")
+        bar.empty()
         plt.close(fig)
-
         return html
+
+    def debug_static_foil(self, airfoil_coords, scale=1.0):
+        base = np.asarray(airfoil_coords, float) * scale
+        xmid = 0.5*(base[:,0].max()+base[:,0].min())
+        base[:,0] -= xmid
+        base[:,0] += self.a
+
+        fig, ax = plt.subplots(figsize=(6,6))
+        ax.set_aspect('equal','box'); ax.grid(True, alpha=0.3)
+        patch = Polygon(base, closed=True, facecolor='red', edgecolor='k', lw=2)
+        ax.add_patch(patch)
+        ax.plot(self.a, 0, 'ko', ms=5)
+        x_min, x_max = base[:,0].min(), base[:,0].max()
+        y_min, y_max = base[:,1].min(), base[:,1].max()
+        chord = max(1e-12, x_max-x_min)
+        span = 0.7*max(chord, y_max-y_min)
+        ax.set_xlim(self.a-1.2*span, self.a+1.2*span)
+        ax.set_ylim(-1.2*span, 1.2*span)
+        plt.show()
+
+    
+    # def animate_flutter(
+    #     self,
+    #     airfoil_coords,
+    #     duration: float = 6,
+    #     fps: int = 30,
+    #     scale: float = 1.0,
+    #     n_modes: int = 1,
+    #     properties: Dict = None,
+    # ):
+    #     """
+    #     Animate airfoil plunge + twist for the first n_modes.
+    #     Layout: n_modes rows × 2 cols (left=airfoil motion, right=displacements with moving dots).
+    #     Returns HTML string (ani.to_jshtml()) for Streamlit.
+    #     """
+    #     # --- visuals defaults ---
+    #     properties = properties or {}
+    #     airfoil_color = properties.get("airfoil_color", "#e53935")  # visible red
+    #     transparency  = properties.get("transparency", 90) / 100.0
+    #     show_chord    = properties.get("show_chord", True)
+
+    #     # --- eigen stuff ---
+    #     if getattr(self, "vals", None) is None or getattr(self, "vecs", None) is None:
+    #         self.compute_response()
+
+    #     n_modes = max(1, int(n_modes))
+    #     n_avail = min(n_modes, len(self.vals))
+    #     n_modes = n_avail
+
+    #     lam   = self.vals[:n_modes]
+    #     gamma = np.real(lam)   # damping
+    #     omega = np.imag(lam)   # frequency (rad/s in your scaling)
+
+    #     # assume state ordering = [h, theta, hdot, thetadot]
+    #     h_amp     = np.real(self.vecs[0, :n_modes]) * self.b
+    #     theta_amp = np.real(self.vecs[1, :n_modes])
+    #     with np.errstate(divide="ignore", invalid="ignore"):
+    #         phase = np.angle(self.vecs[1, :n_modes] / self.vecs[0, :n_modes])
+    #     phase = np.nan_to_num(phase)
+
+    #     # --- time grid & histories (each mode separately) ---
+    #     n_frames = max(2, int(duration * fps))
+    #     t = np.linspace(0.0, duration, n_frames)
+
+    #     h_t = np.array([
+    #         h_amp[i]     * np.exp(gamma[i] * t) * np.cos(omega[i] * t)
+    #         for i in range(n_modes)
+    #     ])                 # shape (n_modes, n_frames)
+    #     th_t = np.array([
+    #         theta_amp[i] * np.exp(gamma[i] * t) * np.cos(omega[i] * t + phase[i])
+    #         for i in range(n_modes)
+    #     ])                 # shape (n_modes, n_frames)
+
+    #     # --- base geometry, centered about elastic axis x=a ---
+    #     base = np.asarray(airfoil_coords, float) * scale
+    #     xmid = 0.5 * (base[:, 0].max() + base[:, 0].min())
+    #     base[:, 0] -= xmid
+    #     base[:, 0] += self.a
+
+    #     # store relative coords for rotation
+    #     x_rel0 = base[:, 0] - self.a
+    #     y_rel0 = base[:, 1].copy()
+
+    #     # --- compute sensible view box from geometry + max plunge amplitude ---
+    #     x_min, x_max = base[:, 0].min(), base[:, 0].max()
+    #     y_min, y_max = base[:, 1].min(), base[:, 1].max()
+    #     chord_len = max(1e-9, x_max - x_min)
+    #     geom_span = max(chord_len, (y_max - y_min))
+    #     plunge_pad = float(np.nanmax(np.abs(h_t))) if np.isfinite(h_t).any() else 0.0
+    #     span = max(0.6 * geom_span + plunge_pad, 1e-6)
+
+    #     # --- figure ---
+    #     fig, axes = plt.subplots(
+    #         nrows=n_modes, ncols=2,
+    #         figsize=(11, 3.6 * n_modes),
+    #         gridspec_kw={"width_ratios": [2, 3]},
+    #     )
+    #     fig.suptitle("Coupled Flutter Modes – Airfoil Motion & Displacements", fontsize=14)
+
+    #     # normalize axes shape for n_modes == 1
+    #     if n_modes == 1:
+    #         axes = np.array([axes])
+
+    #     airfoil_patches = []
+    #     disp_points_h   = []
+    #     disp_points_th  = []
+    #     time_lines      = []
+    #     anim_axes       = []
+
+    #     for i in range(n_modes):
+    #         # LEFT: airfoil motion
+    #         axA = axes[i, 0]
+    #         patch = Polygon(
+    #             base,
+    #             closed=True,
+    #             facecolor=airfoil_color,
+    #             edgecolor="k",
+    #             linewidth=1.5,
+    #             alpha=transparency,
+    #             zorder=5,
+    #         )
+    #         axA.add_patch(patch)
+    #         if show_chord:
+    #             chord_y = base[:, 1].mean()
+    #             axA.plot([x_min, x_max], [chord_y, chord_y], "k--", lw=0.9, zorder=6)
+    #         axA.plot(self.a, 0.0, "ko", ms=4, zorder=7)
+
+    #         axA.set_aspect("equal", "box")
+    #         axA.grid(alpha=0.25)
+    #         axA.set_xlim(self.a - 1.2 * span, self.a + 1.2 * span)
+    #         axA.set_ylim(-1.2 * span, 1.2 * span)
+    #         axA.set_title(f"Mode {i+1}: Airfoil Motion")
+
+    #         airfoil_patches.append(patch)
+    #         anim_axes.append(axA)
+
+    #         # RIGHT: displacement vs time with moving dots
+    #         axD = axes[i, 1]
+    #         axD.plot(t, h_t[i],  "b-", label="Plunge h")
+    #         axD.plot(t, th_t[i], "r--", label="Twist θ")
+    #         axD.set_xlabel("Time")
+    #         axD.set_ylabel("Displacement")
+    #         axD.grid(alpha=0.25)
+    #         axD.legend(fontsize=8)
+    #         axD.set_title(f"Mode {i+1}: Displacements")
+
+    #         # moving dots + vertical time line
+    #         pt_h,  = axD.plot([], [], "bo", ms=6)
+    #         pt_th, = axD.plot([], [], "ro", ms=6, mfc="none")
+    #         disp_points_h.append(pt_h)
+    #         disp_points_th.append(pt_th)
+
+    #         vline = axD.axvline(t[0], color="k", alpha=0.35)
+    #         time_lines.append(vline)
+
+    #     # --- Streamlit progress (coarse) ---
+    #     bar = st.progress(0, text="Rendering animation…")
+
+    #     # --- update (rotate/translate vertices directly; move dots/line) ---
+    #     def update(frame):
+    #         if frame % max(1, n_frames // 20) == 0:
+    #             pct = int(100 * frame / (n_frames - 1))
+    #             bar.progress(pct, text=f"Rendering animation… ({pct}%)")
+
+    #         artists = []
+    #         for i in range(n_modes):
+    #             theta = th_t[i, frame]
+    #             h = h_t[i, frame]
+    #             c, s = np.cos(theta), np.sin(theta)
+
+    #             x = c * x_rel0 - s * y_rel0 + self.a
+    #             y = s * x_rel0 + c * y_rel0 + h
+    #             airfoil_patches[i].set_xy(np.column_stack((x, y)))
+    #             artists.append(airfoil_patches[i])
+
+    #             # move time cursor + dots
+    #             time_lines[i].set_xdata([t[frame], t[frame]])
+    #             disp_points_h[i].set_data([t[frame]], [h_t[i, frame]])
+    #             disp_points_th[i].set_data([t[frame]], [th_t[i, frame]])
+    #             artists.extend([time_lines[i], disp_points_h[i], disp_points_th[i]])
+
+    #         return artists
+
+    #     ani = plt.matplotlib.animation.FuncAnimation(
+    #         fig, update, frames=n_frames, interval=1000 / fps, blit=True
+    #     )
+    #     plt.tight_layout()
+    #     plt.subplots_adjust(top=0.90)
+    #     plt.rcParams["animation.embed_limit"] = 2**128
+
+    #     html = ani.to_jshtml()
+    #     bar.progress(100, text="Done.")
+    #     bar.empty()
+    #     plt.close(fig)
+    #     return html
