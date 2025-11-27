@@ -252,7 +252,7 @@ with col1:
 
             
             run_analysis = st.button('Analyse', use_container_width=True)
-            show_results = st.toggle('Show Results', value=False, key='show_analysis_results_toggle')
+            fa_show_results = st.toggle('Show Results', value=False, key='show_analysis_results_toggle')
 
             # if run_analysis:
             #     st.session_state.fa = FlutterAnalysis(mu, sigma, V, a, b, e, r, mode, w_theta)
@@ -267,9 +267,9 @@ with col1:
                     st.error(f"Flutter analysis failed: {str(e)}")
                     st.session_state.fa = None
 
-            if show_results:
-                results_container = st.container(border=True)
-                with results_container:
+            if fa_show_results:
+                fa_results_container = st.container(border=True)
+                with fa_results_container:
 
                     if st.session_state.fa is not None:
                         st.markdown('<div class="column-header4">Key Numerical Results</div>', unsafe_allow_html=True)
@@ -357,7 +357,9 @@ with col1:
             # with col1_2:
                 
             button_1_3_0 = st.button('Run Study', use_container_width=True)
-            cont1_1_2 = st.container(border=True)
+            ps_show_results = st.toggle('Show Results', value=False, key='show_study_results_toggle')
+
+
 
             # if button_1_3_0:
             #     st.session_state.ps = ParametricStudy(study_param_x, min_val, max_val, step, study_param_y)
@@ -379,6 +381,19 @@ with col1:
                     except Exception as e:
                         st.error(f"Parametric study failed: {str(e)}")
                         st.session_state.ps = None
+
+
+            if ps_show_results:
+                ps_results_container = st.container(border=True)
+                with ps_results_container:
+
+                    if st.session_state.fa is not None:
+                        st.markdown('<div class="column-header4">Parametric Study Results</div>', unsafe_allow_html=True)
+                        if st.session_state.ps.results is not None:
+                            st.dataframe(st.session_state.ps.results, use_container_width=True)
+                        else:
+    
+                            st.info('No results available. Please run parametric study first!', icon="📊")
             ##No results to show for now
             # show_study_results = st.toggle('Show Results', value=False, key='show_study_results_toggle')
             # # Display results if available and requested
@@ -412,7 +427,7 @@ with col1:
                 properties['annotated_text_color'] = st.color_picker('Annotation Color', '#000000')
             
             # Number of modes to show
-            num_modes = st.slider('Number of Modes to Show', 1, 4, 1, 1, help="Select the number of modes to display in the animation.")
+            num_modes = st.slider('Mode Number to Animate', 1, 4, 3, 1, help="Select the mode number to display in the animation.")
 
             properties['transparency'] = st.slider('Airfoil Transparency', 0.0, 1.0, 0.5, 0.01)
             properties['show_chord'] = st.toggle('Show Chord', value=True)
