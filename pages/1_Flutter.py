@@ -465,7 +465,7 @@ with col2:
     with col2:
         cont2_1 = st.container(height = cont_height, border=True)
         with cont2_1: 
-            col2_tabs = st.tabs(["Displacement Plot", "Parametric Study","Incoming Feature", "Animation"])
+            col2_tabs = st.tabs(["Displacement Plot", "Parametric Study", "Animation"])
             
             # # Displacement Plot Tab
             # with col2_tabs[0]:
@@ -595,26 +595,26 @@ with col2:
             #     if button_2_2_1:
             #         st.session_state.plots["Incoming Feature"] = None
 
-            with col2_tabs[2]:
-                col2_2_1, col2_2_2 = st.columns([0.7,0.3])
-                with col2_2_1:
-                    button_2_2_0 = st.button('Plot Incoming Feature', use_container_width=True)
-                with col2_2_2:
-                    button_2_2_1 = st.button('Reset Incoming Feature', use_container_width=True)
+            # with col2_tabs[2]:
+            #     col2_2_1, col2_2_2 = st.columns([0.7,0.3])
+            #     with col2_2_1:
+            #         button_2_2_0 = st.button('Plot Incoming Feature', use_container_width=True)
+            #     with col2_2_2:
+            #         button_2_2_1 = st.button('Reset Incoming Feature', use_container_width=True)
                 
-                if button_2_2_1:
-                    st.session_state.plots["Incoming Feature"] = None
-                    st.info("Feature plot has been reset.")
+            #     if button_2_2_1:
+            #         st.session_state.plots["Incoming Feature"] = None
+            #         st.info("Feature plot has been reset.")
                 
-                buff = st.empty()
-                if button_2_2_0:
-                    with buff:
-                        st.info('This feature is in development!', icon="🚀")
+            #     buff = st.empty()
+            #     if button_2_2_0:
+            #         with buff:
+            #             st.info('This feature is in development!', icon="🚀")
                 
-                # Display existing plot if available (will be useful when feature is implemented)
-                if st.session_state.plots["Incoming Feature"] is not None:
-                    st.markdown('<div class="column-header3">Feature Plot</div>', unsafe_allow_html=True)
-                    st.pyplot(st.session_state.plots["Incoming Feature"], use_container_width=True)
+            #     # Display existing plot if available (will be useful when feature is implemented)
+            #     if st.session_state.plots["Incoming Feature"] is not None:
+            #         st.markdown('<div class="column-header3">Feature Plot</div>', unsafe_allow_html=True)
+            #         st.pyplot(st.session_state.plots["Incoming Feature"], use_container_width=True)
 
             # # Animation Tab
             # with col2_tabs[3]:
@@ -652,7 +652,7 @@ with col2:
             #                 st.info('Rendering Complete!', icon="✅")
             #             buff.empty()
 
-            with col2_tabs[3]:
+            with col2_tabs[2]:
                 col2_3_1, col2_3_2 = st.columns([0.7,0.3])
                 with col2_3_1:
                     button_2_3_0 = st.button('Animate Displacements', use_container_width=True)
