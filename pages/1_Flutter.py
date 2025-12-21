@@ -701,7 +701,7 @@ if st.session_state.show_theory and col3 is not None:
         
         cont3_1 = st.container(height=cont_height,border=True)
         with cont3_1:
-            col3_tabs = st.tabs(["Introduction", "Typical Section Model", "Equations of Motion", "Loading Cases", "Eigenproblem", "Ask Aero"]) #new structure post report
+            col3_tabs = st.tabs(["Introduction", "Typical Section Model", "Equations of Motion", "Loading Cases", "Eigenproblem"])#, "Ask Aero"]) #new structure post report
         # Introduction Tab
         with col3_tabs[0]:
                 #st.markdown('<div class ="column-header3">Aeroelastic Formulation</div>', unsafe_allow_html=True)
@@ -899,9 +899,9 @@ if st.session_state.show_theory and col3 is not None:
                 Requires solving a more complex coupled system, but provides a better approximation of real-world flutter behavior.
                 """)
         
-        # Ask AI Tab
-        with col3_tabs[5]:
-            # st.chat_message('Need some clarification?')
-            # st.chat_input('Ask AeroViz AI a question')
-            # st.write("Coming Soon!")
-            st.title('Stay tuned!')
+        # Ask AI Tab - Can't deploy too streamlit too large. Local version uses huggingface serverless inference api but with rate limiting
+        # with col3_tabs[5]:
+        #     # st.chat_message('Need some clarification?')
+        #     # st.chat_input('Ask AeroViz AI a question')
+        #     # st.write("Coming Soon!")
+        #     st.title('Stay tuned!')
