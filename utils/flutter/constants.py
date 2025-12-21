@@ -52,6 +52,8 @@ ps_indep_dict: Dict[str, str] = {
     'Torsional Vibration Frequency · $\\omega_\\theta$': 'w_theta'  
 }
 
+ps_indep_dict_rev: Dict[str, str] = {v: k for k, v in ps_indep_dict.items()}
+
 # Dictionary of all possible dependent variables for the parametric study
 ps_dep_dict: Dict[str, str] = {
     'Aeroelastic Frequency · $\\omega/\\omega_{\\theta}$': 'omega',

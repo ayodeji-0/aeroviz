@@ -355,13 +355,51 @@ with col1:
                     Select the dependent variable(s) of interest.
                     Note: To run the study you must first configure the system.
                     """)
-
             study_param_y = st.pills('Select Dependent Variable(s)*', list(ps_dep_dict.keys()),selection_mode='multi',default = list(ps_dep_dict.keys())[:3] , help=help_text['dependent_variable'])
 
             #st.markdown('<div class="body">Perform a parametric study to investigate the effect of varying system parameters on flutter characteristics. Select the parameters to vary and fix, along with the range and step size for each parameter. The study will generate a plot showing the variation in flutter speed with the selected parameters.</div>', unsafe_allow_html=True)
             study_param_x = st.pills('Select Parameter to Vary', ps_indep_dict, selection_mode='single', key='study_param_x', help=help_text['independent_variable'])
-            step = st.number_input('Step Size', 0.1, 100.0, 0.1, 0.1)
-            min_val, max_val = st.slider("Select range for independent variable", min_value=0.0, max_value=5.0, value=(0.1, 2.0), step=step)
+            
+            # Only show step and range sliders if a parameter is selected
+            if study_param_x:
+                # Get the parameter key from the reverse mapping
+                param_key = ps_indep_dict[study_param_x]
+                
+                # Get configuration from system_configuration
+                param_config = system_configuration[param_key][1]  # (min, max, step, default)
+                
+                step = st.number_input('Step Size', 
+                                      param_config[0],  # min
+                                      param_config[1],  # max
+                                      param_config[3],  # default
+                                      param_config[2])  # step
+                
+                if step < min(param_config[2], param_config[1] - param_config[0]):
+                    st.warning(f"Step size too small or too large for the selected parameter range. Adjusting to minimum step size of {param_config[2]}.")
+                    step = param_config[2]
+
+                min_val, max_val = st.slider(
+                    f"Select range for {study_param_x}", 
+                    min_value=param_config[0], 
+                    max_value=param_config[1], 
+                    value=(param_config[3], min(param_config[3]*2, param_config[1])), 
+                    step=step
+                )
+            else:
+                st.info("Please select a parameter to vary above")
+                # Set dummy values to avoid errors
+                step = 0.1
+                min_val, max_val = 0.0, 1.0
+
+
+            # study_param_y = st.pills('Select Dependent Variable(s)*', list(ps_dep_dict.keys()),selection_mode='multi',default = list(ps_dep_dict.keys())[:3] , help=help_text['dependent_variable'])
+
+            # #st.markdown('<div class="body">Perform a parametric study to investigate the effect of varying system parameters on flutter characteristics. Select the parameters to vary and fix, along with the range and step size for each parameter. The study will generate a plot showing the variation in flutter speed with the selected parameters.</div>', unsafe_allow_html=True)
+            # study_param_x = st.pills('Select Parameter to Vary', ps_indep_dict, selection_mode='single', key='study_param_x', help=help_text['independent_variable'])
+            # if study_param
+            # step = st.number_input('Step Size', 0.1, 100.0, 0.1, 0.1)
+            # step = st.number_input('Step Size', system_configuration[ps_indep_dict[study_param_x]][1][0], system_configuration[study_param_x][1][1], system_configuration[study_param_x][1][3], system_configuration[study_param_x][1][2]) # min, max, value, step
+            # min_val, max_val = st.slider(f"Select range for {study_param_x}", min_value=system_configuration[study_param_x][1][0], max_value=system_configuration[study_param_x][1][1], value=(system_configuration[study_param_x][1][3], min(system_configuration[study_param_x][1][3]*2, system_configuration[study_param_x][1][1])), step=step)
                 
             
 
