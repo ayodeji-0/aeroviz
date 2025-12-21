@@ -1,27 +1,5 @@
 # File Structure
-# aeroviz/
-# ├── aeroviz.py                # Main page for objectives etc.
-# ├── pages/
-# │   ├── 1_CBT.py              # Coupled Bending Torsion page
-# │   └── [future pages].py     # Other pages
-# ├── modules/
-# │   ├── __init__.py
-# │   ├── cbt/                  # Coupled Bending Torsion specific modules
-# │   │   ├── __init__.py
-# │   │   ├── airfoil.py        # Airfoil class and related functions
-# │   │   ├── analysis.py        # FlutterAnalysis class
-# │   │   ├── parametric.py     # ParametricStudy class
-# │   │   └── visualization.py  # Plotting and animation functions
-# │   └── [other_features]/     # Future feature modules
-# ├── utils/
-# │   ├── __init__.py
-# │   ├── cbt/                  # CBT specific utilities
-# │   │   ├── __init__.py
-# │   │   ├── constants.py      # CBT constants and dictionaries
-# │   │   └── helpers.py        # CBT helper functions
-# │   └── [other_features]/     # Future feature utilities
-# └── styles/
-#     └── stylesheet.py             # Global styles
+
 
 # Imports
 import streamlit as st
@@ -52,7 +30,7 @@ with col2:
 
     ## Page Content
     with st.container(border = True):
-        column_header5("📌 Overview ")
+        column_header5("Overview ")
         body("""
             AeroViz is an educational and interactive platform designed to help beginner and non-expert engineers visualize and understand aeromechanical phenomena in turbomachinery.
             Educational research has shown that interactive learning can be up to 60% more effective than traditional learning.
@@ -62,7 +40,7 @@ with col2:
             computational solutions to mathematical models and key visualizations to explore the physics behind complex phenomena.
             Use the sidebar to begin exploring each module.""")
 
-        column_header5("📋 Motivational Objectives ")
+        column_header5("Motivational Objectives ")
         st.markdown("""
         - Make learning about aeroelasticity dynamic, fun, and accessible
         - Promote active learning 
@@ -73,7 +51,7 @@ with col2:
         - Backed by validated models and real research
         """)
 
-        column_header5("💼 Features")
+        column_header5("Features")
         st.markdown("""
         - Customize parameters and simulate behavior in real-time
         - View brief animations and relevant plots
@@ -82,7 +60,7 @@ with col2:
         - Ask AeroViz AI for guidance pulled straight from the research papers!
         """)
 
-        column_header5("🛠️ Stack")
+        column_header5("Stack")
         st.markdown("""
         - Python (NumPy, Plotly, etc.)
         - Deployed in Streamlit with Git-based version control
@@ -90,7 +68,7 @@ with col2:
         - SciPy for advanced numerical routines
         """)
 
-        column_header5("🔬 About / 📬 Contact")
+        column_header5("About / Contact")
         st.markdown("""
         - Part of an ME4 Individual Research Project at Imperial College London
         - Developed by Ayodeji Adeniyi

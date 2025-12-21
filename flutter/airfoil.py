@@ -15,7 +15,7 @@ class Airfoil:
                  camber_position: float, 
                  thickness: float, 
                  num_points: int = 100, 
-                 length: float = 1.0, 
+                 length: int = 1, 
                  centrepos: float = 0.5):
         """
         Initialize an airfoil with given parameters.
@@ -178,4 +178,3 @@ class Airfoil:
 
         return fig
     
-    # No plotly version, matplotlib is sufficient, and better for airfoil plotting

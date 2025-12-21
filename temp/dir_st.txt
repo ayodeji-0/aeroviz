@@ -1,0 +1,23 @@
+# aeroviz/
+# ├── aeroviz.py                # Main page for objectives etc.
+# ├── pages/
+# │   ├── 1_CBT.py              # Coupled Bending Torsion page
+# │   └── [future pages].py     # Other pages
+# ├── modules/
+# │   ├── __init__.py
+# │   ├── cbt/                  # Coupled Bending Torsion specific modules
+# │   │   ├── __init__.py
+# │   │   ├── airfoil.py        # Airfoil class and related functions
+# │   │   ├── analysis.py        # FlutterAnalysis class
+# │   │   ├── parametric.py     # ParametricStudy class
+# │   │   └── visualization.py  # Plotting and animation functions
+# │   └── [other_features]/     # Future feature modules
+# ├── utils/
+# │   ├── __init__.py
+# │   ├── cbt/                  # CBT specific utilities
+# │   │   ├── __init__.py
+# │   │   ├── constants.py      # CBT constants and dictionaries
+# │   │   └── helpers.py        # CBT helper functions
+# │   └── [other_features]/     # Future feature utilities
+# └── styles/
+#     └── stylesheet.py             # Global styles
