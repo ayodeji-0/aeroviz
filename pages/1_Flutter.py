@@ -146,6 +146,17 @@ with col1:
             if not airfoil_param:
                 st.info("Select parameter(s) to vary")
             else:
+                # Define the mapping from parameter name to tuple position in Airfoil constructor
+                # Constructor expects: (max_camber, camber_position, thickness, num_points, length, centrepos)
+                param_position_map = {
+                    'Max Camber': 0,
+                    'Camber Position': 1,
+                    'Thickness': 2,
+                    'Discretization': 3,  # num_points in constructor
+                    'Length': 4,
+                    'Centre Position': 5
+                }
+                
                 # For each parameter that is selected in the pills
                 for k, v in airfoil_parameters.items():
                     if k in airfoil_param:  # Check if this parameter is selected
@@ -155,8 +166,8 @@ with col1:
                         # Store the value back to session state
                         st.session_state.airfoil_param_values[k] = val
                         
-                        # Update the tuple at the right position
-                        param_index = list(airfoil_parameters.keys()).index(k)
+                        # Update the tuple at the CORRECT position using the mapping
+                        param_index = param_position_map[k]
                         current_airfoil = current_airfoil[:param_index] + (val,) + current_airfoil[param_index+1:]  # Check if any parameter has changed
             
             if st.session_state.airfoil_params is None or current_airfoil != st.session_state.airfoil_params:
